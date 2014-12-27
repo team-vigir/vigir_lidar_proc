@@ -1,0 +1,20 @@
+<package>
+  <name>vigir_laserscan_to_pointcloud</name>
+  <version>0.0.1</version>
+  <description>The vigir_laserscan_to_pointcloud package filters and converts laserscans to point clouds</description>
+  <maintainer email="kohlbrecher@sim.tu-darmstadt.de">Stefan Kohlbrecher</maintainer>
+  <license>BSD</license>
+  <buildtool_depend>catkin</buildtool_depend>
+  
+  <build_depend>roscpp</build_depend>
+  <build_depend>roslib</build_depend>
+  <build_depend>laser_geometry</build_depend>
+  <build_depend>laser_filters</build_depend>
+  <build_depend>tf</build_depend>
+  
+  <run_depend>roscpp</run_depend>
+  <run_depend>roslib</run_depend>
+  <run_depend>laser_filters</run_depend>
+  <run_depend>laser_geometry</run_depend>
+  <run_depend>tf</run_depend>
+</package>
