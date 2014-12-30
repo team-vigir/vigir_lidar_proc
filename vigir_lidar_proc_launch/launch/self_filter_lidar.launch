@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<launch>
+     
+ <!-- <arg name="robot_type" default="atlas_v3_self_filter"/>
+  <param name="robot_description_self_filter" command="$(find xacro)/xacro.py '$(find flor_atlas_description)/robots/$(arg robot_type).urdf.xacro'" />
+  -->
+  <arg name="cloud_in_topic" default="/scan_cloud"/>
+  <arg name="cloud_out_topic" default="/scan_cloud_filtered"/>
+
+  <node pkg="robot_self_filter" type="self_filter" name="self_filter_lidar" output="screen" respawn="true">
+    <remap from="cloud_in" to="$(arg cloud_in_topic)" />
+    <remap from="cloud_out" to="$(arg cloud_out_topic)" />
+<!--    <remap from="robot_description" to="robot_description_self_filter" />
+    <rosparam file="$(find vigir_self_filter)/config/atlas_lidar_self_filter.yaml" command="load" />-->
+  </node>
+  
+</launch>

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+
+<launch>
+  <!-- Set laser_scan_topic to the robot topic as default -->
+  <arg name="scan_topic" default="/multisense_sl/laser/scan" />
+  <arg name="scan_cloud_topic" default="/scan_cloud" />
+  <arg name="target_frame" default="motor" />
+  <arg name="use_high_fidelity_projection" default="true" />
+  
+  <!-- Convert laser scan to 3D point cloud in sensor frame -->
+  <node pkg="vigir_laserscan_to_pointcloud" type="laserscan_to_pointcloud_node" name="scan_to_cloud" respawn="true">
+    <param name="min_range" value="0.05" />
+    <param name="use_high_fidelity_projection" value="$(arg use_high_fidelity_projection)" />
+    <param name="target_frame" value="$(arg target_frame)" />
+    <remap from="scan" to="$(arg scan_topic)" />
+    <remap from="scan_cloud_topic" to="$(arg scan_cloud_filtered_topic)" />
+    <rosparam command="load" file="$(find vigir_laserscan_to_pointcloud)/config/atlas_scan_filter.yaml" />
+  </node>
+
+  <!-- Filter the scan cloud to remove robot intersections -->
+  <include file="$(find vigir_lidar_proc_launch)/launch/self_filter_lidar.launch">
+    
+  </include>
+  
+
+</launch>
+
+

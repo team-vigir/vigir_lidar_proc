@@ -1,0 +1,22 @@
+min_sensor_dist: .01
+self_see_default_padding: .08
+self_see_default_scale: 1.0
+self_see_links:
+- name: pelvis
+- name: utorso
+- name: l_clav
+- name: l_scap
+- name: l_larm
+- name: l_hand
+- name: r_clav
+- name: r_scap
+- name: r_larm
+- name: r_hand
+- name: l_lglut
+- name: l_uleg
+- name: l_lleg
+- name: l_foot
+- name: r_lglut
+- name: r_uleg
+- name: r_lleg
+- name: r_foot
