@@ -7,12 +7,13 @@
   -->
   <arg name="cloud_in_topic" default="/scan_cloud"/>
   <arg name="cloud_out_topic" default="/scan_cloud_filtered"/>
+  <arg name="robot_description_name" value="robot_description"/>
 
   <node pkg="robot_self_filter" type="self_filter" name="self_filter_lidar" output="screen" respawn="true">
     <remap from="cloud_in" to="$(arg cloud_in_topic)" />
     <remap from="cloud_out" to="$(arg cloud_out_topic)" />
-<!--    <remap from="robot_description" to="robot_description_self_filter" />
-    <rosparam file="$(find vigir_self_filter)/config/atlas_lidar_self_filter.yaml" command="load" />-->
+    <remap from="robot_description" to="$(arg robot_description_name)" />
+    <!--<rosparam file="$(find vigir_self_filter)/config/atlas_lidar_self_filter.yaml" command="load" />-->
   </node>
   
 </launch>

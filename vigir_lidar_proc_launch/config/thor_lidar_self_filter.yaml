@@ -2,21 +2,38 @@ min_sensor_dist: .01
 self_see_default_padding: .08
 self_see_default_scale: 1.0
 self_see_links:
-- name: pelvis
-- name: utorso
-- name: l_clav
-- name: l_scap
-- name: l_larm
-- name: l_hand
-- name: r_clav
-- name: r_scap
-- name: r_larm
-- name: r_hand
-- name: l_lglut
-- name: l_uleg
-- name: l_lleg
-- name: l_foot
-- name: r_lglut
-- name: r_uleg
-- name: r_lleg
-- name: r_foot
+-name: pelvis
+-name: l_leg_hip_yaw
+-name: l_leg_hip_roll
+-name: l_leg_thigh
+-name: l_leg_shank
+-name: l_leg_ankle_roll
+-name: l_foot'
+-name: r_leg_hip_yaw
+-name: r_leg_hip_roll
+-name: r_leg_thigh
+-name: r_leg_shank
+-name: r_leg_ankle_roll
+-name: r_foot
+-name: waist
+-name: utorso
+-name: neck_link
+-name: head_link
+-name: l_arm_shoulder_pitch
+-name: l_arm_shoulder_roll
+-name: l_arm_shoulder_yaw
+-name: l_arm_elbow
+-name: l_arm_wrist_yaw
+-name: l_arm_wrist_roll
+-name: l_arm_wrist_yaw2
+-name: l_hand' with 0 geoms
+-name: r_arm_shoulder_pitch
+-name: r_arm_shoulder_roll
+-name: r_arm_shoulder_yaw
+-name: r_arm_elbow' with 1 geoms
+-name: r_arm_wrist_yaw
+-name: r_arm_wrist_roll
+-name: r_arm_wrist_yaw2
+-name: r_hand
+-name: waist_lidar_mount_link
+-name: waist_hokuyo_laser_frame
