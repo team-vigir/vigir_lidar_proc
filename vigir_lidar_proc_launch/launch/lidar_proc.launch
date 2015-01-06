@@ -5,12 +5,13 @@
   <arg name="scan_topic" default="/multisense_sl/laser/scan" />
   <arg name="scan_cloud_topic" default="/scan_cloud" />
   <arg name="scan_cloud_filtered_topic" default="/scan_cloud_filtered" />
+  <arg name="node_name_prefix" default="" />
   
   <arg name="target_frame" default="motor" />
   <arg name="use_high_fidelity_projection" default="true" />
   
   <!-- Convert laser scan to 3D point cloud in sensor frame -->
-  <node pkg="vigir_laserscan_to_pointcloud" type="laserscan_to_pointcloud_node" name="scan_to_cloud" respawn="true">
+  <node pkg="vigir_laserscan_to_pointcloud" type="laserscan_to_pointcloud_node" name="$(arg node_name_prefix)scan_to_cloud" respawn="true">
     <param name="min_range" value="0.05" />
     <param name="use_high_fidelity_projection" value="$(arg use_high_fidelity_projection)" />
     <param name="target_frame" value="$(arg target_frame)" />
@@ -23,6 +24,8 @@
   <include file="$(find vigir_lidar_proc_launch)/launch/self_filter_lidar.launch">
     <arg name="cloud_in_topic" value="$(arg scan_cloud_topic)"/>
     <arg name="cloud_out_topic" value="$(arg scan_cloud_filtered_topic)"/>
+    <arg name="node_name_prefix" value="$(arg node_name_prefix)"/>
+<!--    <arg name="test" value="$(find vigir_self_filter)/config/atlas_lidar_self_filter.yaml"/>-->
   </include>
   
 </launch>

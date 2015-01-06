@@ -8,8 +8,10 @@
   <arg name="cloud_in_topic" default="/scan_cloud"/>
   <arg name="cloud_out_topic" default="/scan_cloud_filtered"/>
   <arg name="robot_description_name" value="robot_description"/>
+  <arg name="node_name_prefix" default="" />
+  
 
-  <node pkg="robot_self_filter" type="self_filter" name="self_filter_lidar" output="screen" respawn="true">
+  <node pkg="robot_self_filter" type="self_filter" name="$(arg node_name_prefix)self_filter_lidar" output="screen" respawn="true">
     <remap from="cloud_in" to="$(arg cloud_in_topic)" />
     <remap from="cloud_out" to="$(arg cloud_out_topic)" />
     <remap from="robot_description" to="$(arg robot_description_name)" />
