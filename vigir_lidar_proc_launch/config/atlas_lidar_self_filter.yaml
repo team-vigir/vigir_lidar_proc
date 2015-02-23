@@ -22,3 +22,7 @@ self_see_links:
 - name: r_foot
 - name: l_hand
 - name: r_hand
+- name: l_uarm
+- name: r_uarm
+- name: l_ufarm
+- name: r_ufarm
