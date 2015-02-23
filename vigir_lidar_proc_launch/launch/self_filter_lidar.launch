@@ -7,7 +7,7 @@
   -->
   <arg name="cloud_in_topic" default="/scan_cloud"/>
   <arg name="cloud_out_topic" default="/scan_cloud_filtered"/>
-  <arg name="robot_description_name" value="robot_description"/>
+  <arg name="robot_description_name" default="robot_description"/>
   <arg name="node_name_prefix" default="" />
   
 

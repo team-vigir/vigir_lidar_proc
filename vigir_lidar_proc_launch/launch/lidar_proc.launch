@@ -6,7 +6,7 @@
   
   <arg name="scan_cloud_topic" default="/scan_cloud" />
   <arg name="scan_cloud_filtered_topic" default="/scan_cloud_filtered" />
-  <arg name="robot_description_name" value="robot_description"/>
+  <arg name="robot_description_name" default="robot_description"/>
   <arg name="node_name_prefix" default="" />
   
   <arg name="min_range" default="0.05" />
@@ -21,7 +21,7 @@
     <param name="target_frame" value="$(arg target_frame)" />
     <remap from="scan" to="$(arg scan_topic)" />
     <remap from="scan_cloud_topic" to="$(arg scan_cloud_topic)" />
-    <rosparam command="load" file="$(find vigir_laserscan_to_pointcloud)/config/atlas_scan_filter.yaml" />
+    <!--<rosparam command="load" file="$(find vigir_laserscan_to_pointcloud)/config/atlas_scan_filter.yaml" />-->
   </node>
 
   <!-- Filter the scan cloud to remove robot intersections -->
