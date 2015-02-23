@@ -20,3 +20,5 @@ self_see_links:
 - name: r_uleg
 - name: r_lleg
 - name: r_foot
+- name: l_hand
+- name: r_hand
