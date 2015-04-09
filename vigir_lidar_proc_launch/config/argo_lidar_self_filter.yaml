@@ -1,0 +1,21 @@
+min_sensor_dist: .01
+self_see_default_padding: .05
+self_see_default_scale: 1.0
+self_see_links:
+- name: base_link
+- name: arm_link_0
+- name: arm_link_1
+- name: arm_link_2
+- name: arm_link_3
+- name: arm_link_4
+- name: front_left_flipper_link
+- name: front_right_flipper_link
+- name: front_hokuyo_laser_frame
+- name: rear_left_flipper_link
+- name: rear_right_flipper_link
+- name: rear_hokuyo_laser_frame
+
+
+
+
+
