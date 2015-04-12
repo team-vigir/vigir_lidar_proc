@@ -8,7 +8,7 @@
   <arg name="cloud_in_topic" default="/scan_cloud_filtered"/>
   <arg name="cloud_out_topic" default="/scan_cloud_aggregated"/>
   
-  <node pkg="vigir_cloud_to_planar_scan" type="laserscan_to_aggregated_cloud" name="laserscan_to_aggregated_cloud" output="screen" respawn="true">
+  <node pkg="vigir_cloud_to_planar_scan" type="rotating_cloud_to_aggregated_cloud_node" name="laserscan_to_aggregated_cloud" output="screen" respawn="true">
     <remap from="cloud" to="$(arg cloud_in_topic)" />
     <remap from="cloud_out" to="$(arg cloud_out_topic)" />
     <param name="target_frame" value="base_link" />
@@ -26,7 +26,7 @@
       
       angle_min: -1.5708 # -M_PI/2
       angle_max: 1.5708 # M_PI/2
-      angle_increment: 0.0027 # M_PI/360.0
+      angle_increment: 0.0027
       scan_time: 0.3333
       range_min: 0.45
       range_max: 4.0
