@@ -21,7 +21,7 @@
     <param name="target_frame" value="$(arg target_frame)" />
     <remap from="scan" to="$(arg scan_topic)" />
     <remap from="scan_cloud_topic" to="$(arg scan_cloud_topic)" />
-    <rosparam command="load" file="$(find vigir_laserscan_to_pointcloud)/config/atlas_scan_filter.yaml" />
+    <rosparam command="load" file="$(find vigir_laserscan_to_pointcloud)/config/argo_scan_filter.yaml" />
   </node>
 
   <!-- Filter the scan cloud to remove robot intersections -->
