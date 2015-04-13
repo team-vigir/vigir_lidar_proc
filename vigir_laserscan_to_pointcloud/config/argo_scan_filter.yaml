@@ -4,12 +4,12 @@ scan_filter_chain:
   params:
     lower_threshold: 0.2
     upper_threshold: 20.0
-- name: dark_shadows
-  type: LaserScanIntensityFilter
-  params: 
-    lower_threshold: 100
-    upper_threshold: 10000
-    disp_histogram: 0
+#- name: dark_shadows
+#  type: LaserScanIntensityFilter
+#  params: 
+#    lower_threshold: 100
+#    upper_threshold: 10000
+#    disp_histogram: 0
 - name: shadows
   type: ScanShadowsFilter
   params:
