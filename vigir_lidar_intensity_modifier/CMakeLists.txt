@@ -13,20 +13,15 @@ catkin_package(
 #  DEPENDS system_lib
 )
 
-
 include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-
-
 add_executable(laser_intensity_modifier_node src/laser_intensity_modifier_node.cpp)
-
 
 target_link_libraries(laser_intensity_modifier_node
    ${catkin_LIBRARIES}
 )
-
 
 install(TARGETS laser_intensity_modifier_node
    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
