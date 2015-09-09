@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+
+<launch>
+  
+  <!-- <arg name="robot_type" default="atlas_v3_self_filter"/>
+  <param name="robot_description_self_filter" command="$(find xacro)/xacro.py '$(find flor_atlas_description)/robots/$(arg robot_type).urdf.xacro'" />
+  -->
+  <arg name="cloud_in_topic" default="/scan_cloud_filtered"/>
+  <arg name="cloud_out_topic" default="/scan_cloud_aggregated"/>
+  
+  <node pkg="vigir_cloud_to_planar_scan" type="rotating_cloud_to_aggregated_cloud_node" name="laserscan_to_aggregated_cloud" output="screen" respawn="true">
+    <remap from="cloud" to="$(arg cloud_in_topic)" />
+    <remap from="cloud_out" to="$(arg cloud_out_topic)" />
+    <param name="target_frame" value="base_link" />
+  </node>
+  
+  <!-- run pointcloud_to_laserscan node -->
+  <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
+    <remap from="cloud_in" to="$(arg cloud_out_topic)"/>
+    <remap from="scan" to="/planar_hokuyo/scan"/>
+    <rosparam>
+      #target_frame: # Leave disabled to output scan in pointcloud frame
+      transform_tolerance: 0.01
+      min_height: 0.1
+      max_height: 1.0
+      
+      angle_min: -1.5708 # -M_PI/2
+      angle_max: 1.5708 # M_PI/2
+      angle_increment: 0.0027
+      scan_time: 0.3333
+      range_min: 0.45
+      range_max: 14.0
+      use_inf: true
+      
+      # Concurrency level, affects number of pointclouds queued for processing and number of threads used
+      # 0 : Detect number of cores
+      # 1 : Single threaded
+      # 2->inf : Parallelism level
+      concurrency_level: 0
+    </rosparam>
+  </node>
+  
+</launch>
