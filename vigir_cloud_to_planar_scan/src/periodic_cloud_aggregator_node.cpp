@@ -57,6 +57,7 @@ public:
 
 
     pnh_.param("target_frame", p_target_frame_, std::string("base_link"));
+    pnh_.param("publish_frequency_hz", p_publish_frequency_, 0.5);
 
     tfl_.reset(new tf::TransformListener());
     wait_duration_ = ros::Duration(0.5);
@@ -73,7 +74,7 @@ public:
 
       //ROS_INFO("Lookup %s %s", p_target_frame_.c_str(), cloud_in->header.frame_id.c_str());
 
-      bool publish = ros::Time::now() > (last_publish_time_ + ros::Duration(2.0));
+      bool publish = ros::Time::now() > (last_publish_time_ + ros::Duration(1/p_publish_frequency_));
       
       if (publish){
 
@@ -129,6 +130,7 @@ protected:
 
   bool p_use_high_fidelity_projection_;
   std::string p_target_frame_;
+  double p_publish_frequency_;
 
   ros::Time last_publish_time_;
 
