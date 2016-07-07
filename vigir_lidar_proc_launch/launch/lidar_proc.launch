@@ -19,8 +19,8 @@
     <param name="min_range" value="$(arg min_range)" />
     <param name="use_high_fidelity_projection" value="$(arg use_high_fidelity_projection)" />
     <param name="target_frame" value="$(arg target_frame)" />
-    <remap from="scan" to="$(arg scan_topic)" />
-    <remap from="scan_cloud_topic" to="$(arg scan_cloud_topic)" />
+    <remap from="/scan" to="$(arg scan_topic)" />
+    <remap from="/scan_cloud" to="$(arg scan_cloud_topic)" />
     <rosparam command="load" file="$(find vigir_laserscan_to_pointcloud)/config/argo_scan_filter.yaml" />
   </node>
 
