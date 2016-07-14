@@ -55,8 +55,13 @@ public:
     
     size_t size = scan_in->intensities.size();
     
-    for (size_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i){
       scan_out_.intensities[i] = desired_intensity_;
+      
+      if (scan_out_.ranges[i] > (scan_out_.range_max - 0.5)){
+       scan_out_.ranges[i] = scan_out_.range_max + 30.0; 
+      }
+    }
     
     scan_pub_.publish(scan_out_);
   }
