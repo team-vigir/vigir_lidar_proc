@@ -57,6 +57,9 @@ public:
 
 
     pnh_.param("target_frame", p_target_frame_, std::string("base_link"));
+    pnh_.param("publish_frame", p_publish_frame_, std::string(""));
+
+
     pnh_.param("publish_frequency_hz", p_publish_frequency_, 0.5);
 
     tfl_.reset(new tf::TransformListener());
@@ -74,46 +77,64 @@ public:
 
       //ROS_INFO("Lookup %s %s", p_target_frame_.c_str(), cloud_in->header.frame_id.c_str());
 
+      pcl::PointCloud<pcl::PointXYZ> pc_tmp;
+
+      pcl::fromROSMsg(*cloud_in, pc_tmp);
+
+      Eigen::Matrix4f sensorToWorld;
+      pcl_ros::transformAsMatrix(transform, sensorToWorld);
+
+      boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> > pc;
+      pc.reset(new pcl::PointCloud<pcl::PointXYZ>());
+
+      pcl::transformPointCloud(pc_tmp, *pc, sensorToWorld);
+
+      cloud_agg_.push_back(pc);
+
+
       bool publish = ros::Time::now() > (last_publish_time_ + ros::Duration(1/p_publish_frequency_));
       
       if (publish){
 
-        pcl::PointCloud<pcl::PointXYZ> tmp_agg_cloud;
+        pcl::PointCloud<pcl::PointXYZ>::Ptr tmp_agg_cloud = boost::make_shared<pcl::PointCloud<pcl::PointXYZ> >();
 
         for (size_t i=0; i < cloud_agg_.size(); ++i){
-          if (tmp_agg_cloud.empty()){
-            tmp_agg_cloud = *cloud_agg_[i];
+          if (tmp_agg_cloud->empty()){
+            *tmp_agg_cloud = *cloud_agg_[i];
           }else{
-            tmp_agg_cloud += *cloud_agg_[i];
+            *tmp_agg_cloud += *cloud_agg_[i];
           }
         }
 
-        pcl::toROSMsg(tmp_agg_cloud, cloud2_);
+        std::string cloud_frame_id = p_target_frame_;
 
-        cloud2_.header.frame_id = p_target_frame_;
+        if (!p_publish_frame_.empty()){
+          tf::StampedTransform publish_transform;
+          tfl_->lookupTransform(p_publish_frame_, p_target_frame_, cloud_in->header.stamp, publish_transform);
+
+          Eigen::Matrix4f publish_transform_eigen;
+          pcl_ros::transformAsMatrix(publish_transform, publish_transform_eigen);
+
+          pcl::PointCloud<pcl::PointXYZ>::Ptr tmp_transformed_cloud = boost::make_shared<pcl::PointCloud<pcl::PointXYZ> >();
+
+          pcl::transformPointCloud(*tmp_agg_cloud, *tmp_transformed_cloud, publish_transform_eigen);
+
+          tmp_agg_cloud = tmp_transformed_cloud;
+
+          cloud_frame_id = p_publish_frame_;
+        }
+
+
+        pcl::toROSMsg(*tmp_agg_cloud, cloud2_);
+
+        cloud2_.header.frame_id = cloud_frame_id;
         cloud2_.header.stamp = ros::Time::now();
         point_cloud2_pub_.publish(cloud2_);
         cloud_agg_.clear();
         
         last_publish_time_ = cloud2_.header.stamp;
 
-      }else{
-
-        pcl::PointCloud<pcl::PointXYZ> pc_tmp;
-
-        pcl::fromROSMsg(*cloud_in, pc_tmp);
-
-        Eigen::Matrix4f sensorToWorld;
-        pcl_ros::transformAsMatrix(transform, sensorToWorld);
-
-        boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> > pc;
-        pc.reset(new pcl::PointCloud<pcl::PointXYZ>());
-
-        pcl::transformPointCloud(pc_tmp, *pc, sensorToWorld);
-
-        cloud_agg_.push_back(pc);
       }
-
     }else{
       ROS_ERROR_THROTTLE(5.0, "Cannot transform from sensor %s to target %s . This message is throttled.",
                          cloud_in->header.frame_id.c_str(),
@@ -130,6 +151,8 @@ protected:
 
   bool p_use_high_fidelity_projection_;
   std::string p_target_frame_;
+  std::string p_publish_frame_;
+
   double p_publish_frequency_;
 
   ros::Time last_publish_time_;
