@@ -109,19 +109,28 @@ public:
         std::string cloud_frame_id = p_target_frame_;
 
         if (!p_publish_frame_.empty()){
-          tf::StampedTransform publish_transform;
-          tfl_->lookupTransform(p_publish_frame_, p_target_frame_, cloud_in->header.stamp, publish_transform);
+          if (tfl_->waitForTransform(p_publish_frame_, p_target_frame_, cloud_in->header.stamp, wait_duration_)){
 
-          Eigen::Matrix4f publish_transform_eigen;
-          pcl_ros::transformAsMatrix(publish_transform, publish_transform_eigen);
+            tf::StampedTransform publish_transform;
+            tfl_->lookupTransform(p_publish_frame_, p_target_frame_, cloud_in->header.stamp, publish_transform);
 
-          pcl::PointCloud<pcl::PointXYZ>::Ptr tmp_transformed_cloud = boost::make_shared<pcl::PointCloud<pcl::PointXYZ> >();
+            Eigen::Matrix4f publish_transform_eigen;
+            pcl_ros::transformAsMatrix(publish_transform, publish_transform_eigen);
 
-          pcl::transformPointCloud(*tmp_agg_cloud, *tmp_transformed_cloud, publish_transform_eigen);
+            pcl::PointCloud<pcl::PointXYZ>::Ptr tmp_transformed_cloud = boost::make_shared<pcl::PointCloud<pcl::PointXYZ> >();
 
-          tmp_agg_cloud = tmp_transformed_cloud;
+            pcl::transformPointCloud(*tmp_agg_cloud, *tmp_transformed_cloud, publish_transform_eigen);
 
-          cloud_frame_id = p_publish_frame_;
+            tmp_agg_cloud = tmp_transformed_cloud;
+
+            cloud_frame_id = p_publish_frame_;
+          }else{
+            ROS_ERROR_THROTTLE(5.0, "Cannot transform from cloud frame %s to publish_frame %s after waiting %f seconds. Not publishing cloud. This message is throttled.",
+                                 p_target_frame_.c_str(),
+                                 p_publish_frame_.c_str(),
+                                 wait_duration_.toSec());
+            return;
+          }
         }
 
 
@@ -136,9 +145,10 @@ public:
 
       }
     }else{
-      ROS_ERROR_THROTTLE(5.0, "Cannot transform from sensor %s to target %s . This message is throttled.",
+      ROS_ERROR_THROTTLE(5.0, "Cannot transform from cloud frame %s to target %s after waiting %f seconds. Not publishing cloud. This message is throttled.",
                          cloud_in->header.frame_id.c_str(),
-                         p_target_frame_.c_str());
+                         p_target_frame_.c_str(),
+                         wait_duration_.toSec());
     }
   }
 
