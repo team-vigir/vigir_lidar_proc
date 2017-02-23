@@ -156,9 +156,7 @@ public:
         last_publish_time_ = cloud2_.header.stamp;
 
         joint_velocity_over_threshold_ = true;
-        ROS_ERROR("pub");
       }else if (publish && !joint_velocity_over_threshold_){
-        ROS_ERROR("pub prevent");
         cloud_agg_.clear();
         last_publish_time_ = ros::Time::now();
         joint_velocity_over_threshold_ = true;
@@ -178,9 +176,7 @@ public:
     for (size_t i = 0; i < msg->name.size(); ++i)
     {
       if (msg->name[i] == p_actuated_joint_name_){
-        ROS_ERROR("bla");
         if (!(msg->velocity[i] > p_actuated_joint_min_velocity_)){
-           ROS_ERROR("bla2");
           joint_velocity_over_threshold_ = false;
         }
       }
