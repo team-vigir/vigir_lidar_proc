@@ -38,6 +38,8 @@
 
 #include <pcl_ros/transforms.h>
 
+#include <sensor_msgs/JointState.h>
+
 /**
  * Subscribes to rotating LIDAR clouds and publishes and asssembles
  * aggregated clouds 
@@ -58,6 +60,8 @@ public:
 
     pnh_.param("target_frame", p_target_frame_, std::string("base_link"));
     pnh_.param("publish_frame", p_publish_frame_, std::string(""));
+    pnh_.param("actuated_joint_name", p_actuated_joint_name_, std::string(""));
+    pnh_.param("actuated_joint_min_velocity", p_actuated_joint_min_velocity_, 0.0);
 
 
     pnh_.param("publish_frequency_hz", p_publish_frequency_, 0.5);
@@ -66,6 +70,13 @@ public:
     wait_duration_ = ros::Duration(0.5);
     
     last_publish_time_ = ros::Time::now();
+
+    if (!p_actuated_joint_name_.empty())
+    {
+      joint_state_sub_ = nh_.subscribe("/joint_states", 10, &RotatingCloudToAggregatedCloud::jointStatesCallback, this);
+    }
+
+    joint_velocity_over_threshold_ = true;
   }
 
   void cloudCallback (const sensor_msgs::PointCloud2::ConstPtr& cloud_in)
@@ -94,7 +105,8 @@ public:
 
       bool publish = ros::Time::now() > (last_publish_time_ + ros::Duration(1/p_publish_frequency_));
       
-      if (publish){
+      // joint_velocity_over_threshold_ only gets set in joint state callback
+      if (publish && joint_velocity_over_threshold_){
 
         pcl::PointCloud<pcl::PointXYZ>::Ptr tmp_agg_cloud = boost::make_shared<pcl::PointCloud<pcl::PointXYZ> >();
 
@@ -143,7 +155,16 @@ public:
         
         last_publish_time_ = cloud2_.header.stamp;
 
+        joint_velocity_over_threshold_ = true;
+        ROS_ERROR("pub");
+      }else if (publish && !joint_velocity_over_threshold_){
+        ROS_ERROR("pub prevent");
+        cloud_agg_.clear();
+        last_publish_time_ = ros::Time::now();
+        joint_velocity_over_threshold_ = true;
       }
+
+
     }else{
       ROS_ERROR_THROTTLE(5.0, "Cannot transform from cloud frame %s to target %s after waiting %f seconds. Not publishing cloud. This message is throttled.",
                          cloud_in->header.frame_id.c_str(),
@@ -152,9 +173,25 @@ public:
     }
   }
 
+  void jointStatesCallback (const sensor_msgs::JointState::ConstPtr& msg)
+  {
+    for (size_t i = 0; i < msg->name.size(); ++i)
+    {
+      if (msg->name[i] == p_actuated_joint_name_){
+        ROS_ERROR("bla");
+        if (!(msg->velocity[i] > p_actuated_joint_min_velocity_)){
+           ROS_ERROR("bla2");
+          joint_velocity_over_threshold_ = false;
+        }
+      }
+    }
+  }
+
 protected:
   ros::Subscriber scan_sub_;
   ros::Publisher point_cloud2_pub_;
+
+  ros::Subscriber joint_state_sub_;
 
   boost::shared_ptr<tf::TransformListener> tfl_;
   ros::Duration wait_duration_;
@@ -162,6 +199,10 @@ protected:
   bool p_use_high_fidelity_projection_;
   std::string p_target_frame_;
   std::string p_publish_frame_;
+
+  std::string p_actuated_joint_name_;
+  double p_actuated_joint_min_velocity_;
+  bool joint_velocity_over_threshold_;
 
   double p_publish_frequency_;
 
