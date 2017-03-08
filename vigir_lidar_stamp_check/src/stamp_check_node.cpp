@@ -1,4 +1,4 @@
-//=================================================================================================
+﻿//=================================================================================================
 // Copyright (c) 2012, Stefan Kohlbrecher, TU Darmstadt
 // All rights reserved.
 
@@ -27,6 +27,9 @@
 //=================================================================================================
 
 #include <ros/ros.h>
+
+#include <std_msgs/Float64.h>
+
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/JointState.h>
 
@@ -42,8 +45,12 @@ public:
     scan_sub_ = nh_.subscribe("/spin_laser/pitch_scan", 10, &StampChecker::scanCallback, this);
     joint_state_sub_ = nh_.subscribe("joint_states", 10, &StampChecker::jointStateCallback, this);
     scan_pub_ = nh_.advertise<sensor_msgs::LaserScan>("scan_out",10,false);
+    scan_diff_pub_ = nh_.advertise<std_msgs::Float64>("scan_diffs",10,false);
+
     joint_state_pub_ = nh_.advertise<sensor_msgs::JointState>("spin_joint_state",10,false);
 
+
+    diff_moving_avg_ = std::numeric_limits<float>::quiet_NaN();
 
 
 
@@ -60,7 +67,31 @@ public:
 
     double diff = (scan_in->header.stamp - last_scan_->header.stamp).toSec();
 
-    ROS_INFO("Diff between incoming scans was %f seconds", diff);
+    float alpha = 0.01;
+
+    ros::Time scan_stamp;
+
+    if (!(diff_moving_avg_ == diff_moving_avg_) ){
+      diff_moving_avg_ = diff;
+      scan_stamp = scan_in->header.stamp;
+    }else{
+      diff_moving_avg_ = alpha * diff + (1.0f - alpha) * diff_moving_avg_;
+      scan_stamp = scan_modded_.header.stamp + ros::Duration(diff_moving_avg_);
+    }
+
+
+
+    scan_modded_ = *scan_in;
+    scan_modded_.header.stamp = scan_stamp;
+    scan_pub_.publish(scan_modded_);
+
+
+
+    std_msgs::Float64 diff_msg;
+    diff_msg.data = diff;
+    scan_diff_pub_.publish(diff_msg);
+
+    ROS_INFO("Diff between incoming scans was %f seconds , moving avg is %f", diff, diff_moving_avg_);
 
     last_scan_ = scan_in;
   }
@@ -80,7 +111,10 @@ public:
 
     ROS_INFO("Diff between incoming spin joint states was %f seconds", diff);
 
-    joint_state_pub_.publish(joint_state_in);
+    sensor_msgs::JointState joint_state_out = *joint_state_in;
+    joint_state_out.effort.push_back(diff);
+
+    joint_state_pub_.publish(joint_state_out);
 
     last_joint_state_ = joint_state_in;
   }
@@ -88,6 +122,7 @@ public:
 protected:
   ros::Subscriber scan_sub_;
   ros::Publisher scan_pub_;
+  ros::Publisher scan_diff_pub_;
 
   ros::Subscriber joint_state_sub_;
   ros::Publisher joint_state_pub_;
@@ -97,8 +132,10 @@ protected:
   
   float scan_stamp_diff_;
   float joint_state_stamp_diff_;
+  float diff_moving_avg_;
   
   sensor_msgs::LaserScan scan_out_;
+  sensor_msgs::LaserScan scan_modded_;
 
   sensor_msgs::LaserScan::ConstPtr last_scan_;
   sensor_msgs::JointState::ConstPtr last_joint_state_;
