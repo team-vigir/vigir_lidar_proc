@@ -48,6 +48,7 @@ public:
     ros::NodeHandle pnh_("~");
     pnh_.param("max_range", p_max_range_, 29.0);
     pnh_.param("min_range", p_min_range_, 0.0);
+    pnh_.param("forward_only_frame_id", p_forward_frame_id_, std::string(""));
 
     filter_chain_.configure("scan_filter_chain", pnh_);
 
@@ -70,6 +71,12 @@ public:
 
   void scanCallback (const sensor_msgs::LaserScan::ConstPtr& scan_in)
   {
+    if (!p_forward_frame_id_.empty()){
+      if (scan_in->header.frame_id != p_forward_frame_id_){
+        ROS_DEBUG("Not forwarding scan data with frame_id %s as only %s has been selected for forwarding.", scan_in->header.frame_id.c_str(), p_forward_frame_id_.c_str());
+        return;
+      }
+    }
 
     filter_chain_.update(*scan_in, scan_filtered_);
 
@@ -126,6 +133,7 @@ protected:
   double p_min_range_;
   bool p_use_high_fidelity_projection_;
   std::string p_target_frame_;
+  std::string p_forward_frame_id_;
 
   laser_geometry::LaserProjection projector_;
 
