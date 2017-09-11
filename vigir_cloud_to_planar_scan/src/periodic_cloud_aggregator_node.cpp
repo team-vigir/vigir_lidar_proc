@@ -88,15 +88,15 @@ public:
 
       //ROS_INFO("Lookup %s %s", p_target_frame_.c_str(), cloud_in->header.frame_id.c_str());
 
-      pcl::PointCloud<pcl::PointXYZ> pc_tmp;
+      pcl::PointCloud<pcl::PointXYZI> pc_tmp;
 
       pcl::fromROSMsg(*cloud_in, pc_tmp);
 
       Eigen::Matrix4f sensorToWorld;
       pcl_ros::transformAsMatrix(transform, sensorToWorld);
 
-      boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> > pc;
-      pc.reset(new pcl::PointCloud<pcl::PointXYZ>());
+      boost::shared_ptr<pcl::PointCloud<pcl::PointXYZI> > pc;
+      pc.reset(new pcl::PointCloud<pcl::PointXYZI>());
 
       pcl::transformPointCloud(pc_tmp, *pc, sensorToWorld);
 
@@ -108,7 +108,7 @@ public:
       // joint_velocity_over_threshold_ only gets set in joint state callback
       if (publish && joint_velocity_over_threshold_){
 
-        pcl::PointCloud<pcl::PointXYZ>::Ptr tmp_agg_cloud = boost::make_shared<pcl::PointCloud<pcl::PointXYZ> >();
+        pcl::PointCloud<pcl::PointXYZI>::Ptr tmp_agg_cloud = boost::make_shared<pcl::PointCloud<pcl::PointXYZI> >();
 
         for (size_t i=0; i < cloud_agg_.size(); ++i){
           if (tmp_agg_cloud->empty()){
@@ -129,7 +129,7 @@ public:
             Eigen::Matrix4f publish_transform_eigen;
             pcl_ros::transformAsMatrix(publish_transform, publish_transform_eigen);
 
-            pcl::PointCloud<pcl::PointXYZ>::Ptr tmp_transformed_cloud = boost::make_shared<pcl::PointCloud<pcl::PointXYZ> >();
+            pcl::PointCloud<pcl::PointXYZI>::Ptr tmp_transformed_cloud = boost::make_shared<pcl::PointCloud<pcl::PointXYZI> >();
 
             pcl::transformPointCloud(*tmp_agg_cloud, *tmp_transformed_cloud, publish_transform_eigen);
 
@@ -206,7 +206,7 @@ protected:
 
   sensor_msgs::PointCloud2 cloud2_;
 
-  std::vector<boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> > > cloud_agg_;
+  std::vector<boost::shared_ptr<pcl::PointCloud<pcl::PointXYZI> > > cloud_agg_;
 };
 
 int main(int argc, char** argv)
