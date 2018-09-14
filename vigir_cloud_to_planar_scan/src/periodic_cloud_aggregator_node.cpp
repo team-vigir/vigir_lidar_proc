@@ -176,7 +176,7 @@ public:
     for (size_t i = 0; i < msg->name.size(); ++i)
     {
       if (msg->name[i] == p_actuated_joint_name_){
-        if (!(msg->velocity[i] > p_actuated_joint_min_velocity_)){
+        if ((std::abs(msg->velocity[i]) < p_actuated_joint_min_velocity_)){
           joint_velocity_over_threshold_ = false;
         }
       }
