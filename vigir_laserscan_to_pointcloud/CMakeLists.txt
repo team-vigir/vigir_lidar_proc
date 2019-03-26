@@ -5,7 +5,7 @@ project(vigir_laserscan_to_pointcloud)
 ## this package depends at build time
 
 find_package(catkin REQUIRED COMPONENTS roscpp cmake_modules roslib laser_filters laser_geometry tf eigen_stl_containers eigen_conversions)
-find_package(Eigen REQUIRED)
+find_package(Eigen3 REQUIRED)
 
 include_directories(${catkin_INCLUDE_DIRS} ${EIGEN_INCLUDE_DIRS})
 add_definitions(${EIGEN_DEFINITIONS})
