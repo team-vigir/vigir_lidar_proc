@@ -14,7 +14,7 @@ add_definitions(${EIGEN_DEFINITIONS})
 catkin_package(
     LIBRARIES ${PROJECT_NAME}
     CATKIN_DEPENDS roscpp roslib laser_filters tf
-    DEPENDS eigen 
+#    DEPENDS eigen 
 )
 
 #set the default path for built executables to the "bin" directory
